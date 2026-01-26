@@ -1,0 +1,2 @@
+libasm
+Libasm est un projet du cursus 42 visant à se familiariser avec l'assembleur x86-64. L'objectif est de réimplémenter plusieurs fonctions de la bibliothèque standard C (libc) en manipulant directement les registres, la pile (stack) et les appels système (syscalls).
