@@ -2,12 +2,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 
 // Prototypes de tes fonctions en assembleur
 extern size_t	ft_strlen(const char *s);
 extern char		*ft_strcpy(char *dest, const char *src);
 extern int		ft_strcmp(const char *s1, const char *s2);
 extern char		*ft_strdup(const char *s);
+extern ssize_t ft_write(int fd, const void *buf, size_t count);
 
 int main(void)
 {
@@ -54,18 +56,43 @@ int main(void)
 	else
 		printf("Erreur d'allocation malloc.\n");
 
+	printf("TEST ft_write : \n\n");
+	ft_write(1, "Test stdout\n", 12);
+	ft_write(1, "mauvaise len en param (trop petite)\n", 12); // truncate a 12
+	ft_write(1, "mauvaise len en param (trop grande)\n", 120); // print de la memoire
+	printf("TEST STRINGS VIDES ET NULL\n\n");
+	ft_write(1, NULL, 0); // crash pas 
+	ft_write(1,"h\n", 2);
+	ft_write(1, "", 0); //crash pas
+	ft_write(1, NULL, 1000); // print pas de memoire
+	ft_write(1,"i\n", 2);
+	ft_write(1, "", 1000); // print  de la memoire
+	ft_write(1,"3\n", 2);
+
+	errno = 0;
+	ssize_t ret = ft_write(-42, "test", 4);
+	if (ret == -1)
+    	printf("Succès : write a capturé l'erreur. Errno = %d\n", errno);
+
+
 	printf("TEST WRITE LIBC: \n\n");
 	write(1, "Test stdout\n", 12);
 	write(1, "mauvaise len en param (trop petite)\n", 12); // truncate a 12
 	write(1, "mauvaise len en param (trop grande)\n", 120); // print de la memoire
 	printf("TEST STRINGS VIDES ET NULL\n\n");
 	write(1, NULL, 0); // crash pas 
-	write(1,"\n", 1);
+	write(1,"H\n", 2);
 	write(1, "", 0); //crash pas
+	write(1,"HH\n", 3);
 	write(1, NULL, 1000); // print pas de memoire
-	write(1,"\n", 1);
+	write(1,"I\n", 2);
 	write(1, "", 1000); // print  de la memoire
-	write(1,"\n", 1);
+	write(1,"J\n", 2);
+
+	errno = 0;
+	ssize_t ret1 = write(-42, "test", 4);
+	if (ret1 == -1)
+    	printf("Succès : write a capturé l'erreur. Errno = %d\n", errno);
 
 
 	return (0);
