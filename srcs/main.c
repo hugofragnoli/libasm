@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 // Prototypes de tes fonctions en assembleur
 extern size_t	ft_strlen(const char *s);
@@ -19,7 +20,7 @@ int main(void)
 
 	printf("=== TEST FT_STRCPY ===\n");
 	char dest[20];
-	char *src = "Copie-moi !";
+	char *src = "Copie-moi !";  
 	ft_strcpy(dest, src);
 	printf("Src: %s | Dest: %s\n\n", src, dest);
 
@@ -52,6 +53,20 @@ int main(void)
     }
 	else
 		printf("Erreur d'allocation malloc.\n");
+
+	printf("TEST WRITE LIBC: \n\n");
+	write(1, "Test stdout\n", 12);
+	write(1, "mauvaise len en param (trop petite)\n", 12); // truncate a 12
+	write(1, "mauvaise len en param (trop grande)\n", 120); // print de la memoire
+	printf("TEST STRINGS VIDES ET NULL\n\n");
+	write(1, NULL, 0); // crash pas 
+	write(1,"\n", 1);
+	write(1, "", 0); //crash pas
+	write(1, NULL, 1000); // print pas de memoire
+	write(1,"\n", 1);
+	write(1, "", 1000); // print  de la memoire
+	write(1,"\n", 1);
+
 
 	return (0);
 }

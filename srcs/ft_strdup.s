@@ -13,7 +13,7 @@ _ft_strdup:
 	mov		rdi, rax			; On stocke la size qui est initialement dans rax vers rdi pour le passer a malloc car malloc attend son argument dans rdi.
 	call	_malloc				; ON malloc la bonne size stockee dans rdi. Ici on renvoie un pointeur -> si succes rax contient ladresse du premier octet de la zone memoire quil a reserve sur la heap. Echec -> Malloc renvoie l adresse 0  (NULL en C).
 
-	test	rax, rax			; On test si rax vaut 0. ?? Malloc met a jour errno lui meme en cas derreur
+	test	rax, rax			; On test si rax vaut 0. ?? Malloc met a jour errno lui meme en cas derreur.
 	jz		.error				; on saute a error qui va ret 0 (comportement strdup).
 
 	mov		rdi, rax			; On prepare lappel a strcpy. La dest (rdi) doit etre la nouvelle memoire que malloc vient de nous donner(qui etait dans le rax).
