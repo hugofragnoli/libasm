@@ -6,7 +6,7 @@ global  _ft_atoi_base           ;
 ._ft_atoi_base:
     push rbp                    ;
     mov rbp, rsp                ;
-    xor rax, rax                ; init le res a 0
+
     valid_base, rdi             ;
     cmp rdi, 0                  ;
 
@@ -19,6 +19,9 @@ global  _ft_atoi_base           ;
     cmp rax, 2                  ; on recupere notre pointeur vers str
     jl  .error_return           ; Si rax < 2, jump vers le retour direct.
     mov r8, rax                 ; on stocke la taille de la base dans r8 pour plus tard.
+
+.init_result:
+        xor rax, rax                ; init le res a 0
 
 .skip_spaces:
     mov al, [rdi]       ; On charge le caractère actuel dans AL (8 bits)
