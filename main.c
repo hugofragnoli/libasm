@@ -12,6 +12,7 @@ extern char		*ft_strcpy(char *dest, const char *src);
 extern int		ft_strcmp(const char *s1, const char *s2);
 extern char		*ft_strdup(const char *s);
 extern ssize_t ft_write(int fd, const void *buf, size_t count);
+extern ssize_t ft_read(int fd, void *buf, size_t count);
 
 int main(void)
 {
@@ -124,11 +125,44 @@ int main(void)
 	 	return 0;
 	}
 	char buffer1[1024];
-	ssize_t len_test1 = read(fd1, buffer1, 1023);
+	ssize_t len_test1 = ft_read(fd1, buffer1, 1023);
 	buffer1[len_test1] = '\0';
 	printf("contenu du fd : %s\n", buffer1);
 	printf("len_test = %zd\n", len_test1);
 	close(fd1);
+
+	printf("TEST ERRNO SUR FT_READ :\n");
+	errno = 0;
+	char buf2[10];
+	ssize_t ret2;
+
+	ret2 = ft_read(-1, buf2, 5);
+	printf("Retour de ft_read : %ld\n", ret2);
+    printf("Valeur de errno   : %d\n", errno);
+    printf("Message d'erreur  : %s\n", strerror(errno));
+
+	if (ret2 == -1 && errno == EBADF) {
+        printf("RESULTAT : ✅ SUCCESS (Errno est bien EBADF)\n");
+    } else {
+        printf("RESULTAT : ❌ FAILURE\n\n");
+    }
+
+	printf("TEST ERRNO SUR READ LIBC :\n");
+
+	errno = 0;
+	char buf3[10];
+	ssize_t ret3;
+
+	ret3 = ft_read(-1, buf3, 5);
+	printf("Retour de ft_read : %ld\n", ret3);
+    printf("Valeur de errno   : %d\n", errno);
+    printf("Message d'erreur  : %s\n", strerror(errno));
+
+	if (ret3 == -1 && errno == EBADF) {
+        printf("RESULTAT : ✅ SUCCESS (Errno est bien EBADF)\n");
+    } else {
+        printf("RESULTAT : ❌ FAILURE\n\n");
+    }
 	
 	return (0);
 }
