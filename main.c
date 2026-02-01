@@ -167,7 +167,9 @@ int main(void)
 
 	printf("=== TEST FT_ATOI_BASE ===\n");
 
-	int res = ft_atoi_base("123", "0123456789");
+	int res = ft_atoi_base("2147483647", "0123456789");
+	printf("Expected 123 : res = %d \n", res);
+	res = ft_atoi_base("-2147483648", "0123456789");
 	printf("Expected 123 : res = %d \n", res);
 	res = ft_atoi_base("  --42", "0123456789");
 	printf("Expected 42 : res = %d \n", res);
@@ -186,6 +188,8 @@ int main(void)
 	res = ft_atoi_base("", "01");
 	printf("Expected 0 : res = %d \n", res);
 	res = ft_atoi_base("42", "");
+	printf("Expected 0 : res = %d \n", res);
+	res = ft_atoi_base("-2147483649", "0123456789");
 	printf("Expected 0 : res = %d \n", res);
 	
 	return (0);
