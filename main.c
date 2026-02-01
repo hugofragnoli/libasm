@@ -13,6 +13,7 @@ extern int		ft_strcmp(const char *s1, const char *s2);
 extern char		*ft_strdup(const char *s);
 extern ssize_t ft_write(int fd, const void *buf, size_t count);
 extern ssize_t ft_read(int fd, void *buf, size_t count);
+extern	int		ft_atoi_base(char *str, char *base);
 
 int main(void)
 {
@@ -163,6 +164,29 @@ int main(void)
     } else {
         printf("RESULTAT : ❌ FAILURE\n\n");
     }
+
+	printf("=== TEST FT_ATOI_BASE ===\n");
+
+	int res = ft_atoi_base("123", "0123456789");
+	printf("Expected 123 : res = %d \n", res);
+	res = ft_atoi_base("  --42", "0123456789");
+	printf("Expected 42 : res = %d \n", res);
+	res = ft_atoi_base("101010", "01");
+	printf("Expected 42 : res = %d \n", res);
+	res = ft_atoi_base("2a", "0123456789abcdef");
+	printf("Expected 42 : res = %d \n", res);
+	res = ft_atoi_base(" \t\n -+--2a", "0123456789abcdef");
+	printf("Expected -42 : res = %d \n", res);
+	res = ft_atoi_base("42", "0123456789++");
+	printf("Expected 0 : res = %d \n", res); // base invalide
+	res = ft_atoi_base("42", "01");
+	printf("Expected 0 : res = %d \n", res); // '4' n'est pas dans la base       
+	res = ft_atoi_base("a42", "01");
+	printf("Expected 0 : res = %d \n", res);
+	res = ft_atoi_base("", "01");
+	printf("Expected 0 : res = %d \n", res);
+	res = ft_atoi_base("42", "");
+	printf("Expected 0 : res = %d \n", res);
 	
 	return (0);
 }
