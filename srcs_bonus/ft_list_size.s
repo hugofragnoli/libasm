@@ -13,6 +13,6 @@ _ft_list_size:
     mov rdi, [rdi + 8]      ; on met dans rdi offset + 8 pour aller sur lequiv du pointeur next de ta lst car adresse du pointeur de data = 0, deuxieme pointeur (next) = + 8.
     jmp .loop               ; Et cest repartiiiii
 
-
+jle -> pour cmp if less or equal on swap pas.
 .end:
     ret                     ;
