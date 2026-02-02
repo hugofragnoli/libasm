@@ -22,10 +22,12 @@ _ft_list_sort:
     jz .clean       ;
 
     mov r13, rsi    ; On met ladresse de cmp dans r13 pour call plus tard. (pour cmp et swap si > 0)
-    mov rdi, [rdi + 8];
-    mov r14, rdi    ;
-    test r14, r14   ;
-    jz.clean        ;
+
+.loop_main:         ; Bubble sort
+    xor r14, r14    ; On remet le flag du swap a 0 au debut de chaque tour de boucle.
+    mov rbx, r12    ; rbx = tete de liste pour repartir du debut.
+
+
 
 .clean:
     pop r14         ; On clean dans lordre dinverse pour respecter lordre de la pile -> LIFO
