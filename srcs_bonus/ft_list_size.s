@@ -8,11 +8,10 @@ _ft_list_size:
 
 .loop:
     test rdi, rdi           ; on test si rdi est NULL.
-    jz .end                 ;
+    jz .end                 ;                     *data -> 0 octet * next -> 8 octets
     inc rax                 ; Compteur + 1.
     mov rdi, [rdi + 8]      ; on met dans rdi offset + 8 pour aller sur lequiv du pointeur next de ta lst car adresse du pointeur de data = 0, deuxieme pointeur (next) = + 8.
     jmp .loop               ; Et cest repartiiiii
 
-jle -> pour cmp if less or equal on swap pas.
 .end:
-    ret                     ;
+    ret                     ; ret -> rax. 
