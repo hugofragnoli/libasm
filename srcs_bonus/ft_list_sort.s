@@ -5,7 +5,7 @@ global _ft_list_sort
 
 _ft_list_sort:
 
-
+ 
 
 
 ;Pour swap :
@@ -13,4 +13,4 @@ _ft_list_sort:
 mov rax, [rdi]    ; Charger valeur A dans RAX (temporaire)
 mov rdx, [rsi]    ; Charger valeur B dans RDX
 mov [rdi], rdx    ; Mettre valeur B à l'adresse A
-mov [rsi], rax    ; Mettre valeur A (stockée dans RAX) à l'adresse B
+mov [rsi], rax    ; Mettre valeur A (stockée dans RAX) à l'adresse B 
