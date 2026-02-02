@@ -122,8 +122,8 @@ _ft_atoi_base:
     ; Cas où le nombre est positif (signe == 1)
     cmp r11, 1
     jne .check_min       ; Si négatif, on va vérifier la borne min
-    cmp rax, 2147483647  ; Comparer avec INT_MAX
-    jg .error_return     ; Si RAX > 2147483647 -> Overflow
+    cmp rax, 2147483647  ;
+    jg .error_return     ;
 
 .check_min:
     ; Cas où le nombre est négatif
