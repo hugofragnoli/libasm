@@ -12,7 +12,8 @@ Pour compiler :
 5 bis/ Recompiler avec les test : make re test
 Si vous voulez compiler ce projet sur architecture AMD 64 :
 1/ il faudra modifier les noms des fonctions : _ft_strlen -> ft_strlen
-2/ Modifier les appels pour check errno car le fonctionnement d'errno est different sur ARM 64
+2/ Modifier les appels pour check errno car le fonctionnement d'errno est different sur ARM 64.
+3/ N'hesitez pas a me faire un retour s il y a autre chose !
 
 Merci pour l'intéret porté au projet !!
 

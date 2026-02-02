@@ -24,7 +24,7 @@ _ft_list_sort:
     mov r13, rsi    ; On met ladresse de cmp dans r13 pour call plus tard. (pour cmp et swap si > 0)
 
 .clean:
-    pop r14         ;
+    pop r14         ; On clean dans lordre dinverse pour respecter lordre de la pile -> LIFO
     pop r13         ;
     pop r12         ;
     pop rbx         ;
