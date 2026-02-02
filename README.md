@@ -10,6 +10,9 @@ Pour compiler :
 4/ Pour tout supprimer : Make Fclean
 5/ Pour recompiler : make re
 5 bis/ Recompiler avec les test : make re test
+Si vous voulez compiler ce projet sur architecture AMD 64 :
+1/ il faudra modifier les noms des fonctions : _ft_strlen -> ft_strlen
+2/ Modifier les appels pour check errno car le fonctionnement d'errno est different sur ARM 64
 
 Merci pour l'intéret porté au projet !!
 
