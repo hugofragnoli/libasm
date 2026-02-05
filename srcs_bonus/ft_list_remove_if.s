@@ -10,15 +10,25 @@ _ft_list_remove_if:
     jz .ret                 ; return
     test rsi, rsi           ; data_ref == NULL ?
     jz .ret                 ;
-    push rbp                ; push sur le sommet de la pile.
+    push rbp                ; push sur le sommet de la pile. + 8 -> ici on est a 16
     mov rbp, rsp            ;
-    push rbx                ; "current"
-    push r12                ; "begin_list"
-    push r13                ; "data_ref"
-    push r14                ; "cmp"
-    push r15                ; "free"
+    push rbx                ; "current" + 8
+    push r12                ; "begin_list" + 8
+    push r13                ; "data_ref" + 8
+    push r14                ; "cmp" + 8
+    push r15                ; "free" + 8
+    sub rsp, 8              ; on retire 8 octets pour aligner la pile (56 + 8 = 64 donc multiple de 16)
 
 .keep_node:                 ; Pas dans le if donc on avance normalement.
     mov rbp, rbx            ; previous = current
     mov rbx, [rbx + 8]      ; current = current->next
     jmp .loop
+
+.clean
+    add rsp, 8              ;
+    pop r15                 ;
+    pop r14                 ;
+    pop r13                 ;
+    pop r12                 ;
+    pop rbx                 ;
+    leave                   ; libere rbp
