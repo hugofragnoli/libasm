@@ -10,7 +10,7 @@ SRCS        = srcs/ft_strlen.s srcs/ft_strcpy.s srcs/ft_strcmp.s \
 OBJ_DIR     = obj
 OBJS        = $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.s=.o)))
 
-SRCS_BONUS  = srcs_bonus/ft_atoi_base.s 
+SRCS_BONUS  = srcs_bonus/ft_atoi_base.s srcs_bonus/ft_list_size.s srcs_bonus/ft_list_sort.s srcs_bonus/ft_list_remove_if.s srcs_bonus/ft_list_push_front.s
 OBJ_BONUS_DIR = obj_bonus
 OBJS_BONUS  = $(addprefix $(OBJ_BONUS_DIR)/, $(notdir $(SRCS_BONUS:.s=.o)))
 

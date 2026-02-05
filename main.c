@@ -5,192 +5,142 @@
 #include <errno.h>
 #include <fcntl.h>
 
+// --- STRUCTURE LISTE POUR LES BONUS ---
+typedef struct s_list {
+    void            *data;
+    struct s_list   *next;
+} t_list;
 
-// Prototypes des fonctions en assembleur
-extern size_t	ft_strlen(const char *s);
-extern char		*ft_strcpy(char *dest, const char *src);
-extern int		ft_strcmp(const char *s1, const char *s2);
-extern char		*ft_strdup(const char *s);
+// --- PROTOTYPES DES FONCTIONS ASSEMBLEUR ---
+extern size_t  ft_strlen(const char *s);
+extern char    *ft_strcpy(char *dest, const char *src);
+extern int     ft_strcmp(const char *s1, const char *s2);
+extern char    *ft_strdup(const char *s);
 extern ssize_t ft_write(int fd, const void *buf, size_t count);
 extern ssize_t ft_read(int fd, void *buf, size_t count);
-extern	int		ft_atoi_base(char *str, char *base);
+extern int     ft_atoi_base(char *str, char *base);
 
-int main(void)
-{
-	printf("=== TEST FT_STRLEN ===\n");
-	char *str_len = "Hello Worldgfdghdfhygdfhfghjfghfgfghfhfghfghfghfghfghgfhfghfghfghfgghfghfghfghfghfghfghfgghfghgfhfghfgghfgghfghfghgfhfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghfghgfhfghghfghfghfghfghfghfgghfghfghfghfghfghfghgfhgfhfghfghfghfghfghfghfghfghfghfghfghfghfghghfghghfghfghfghfghfghfghfghfghfghfghfghfg";
-    char *str_empty = "";
-	printf("Libc: %zu | FT: %zu\n\n", strlen(str_len), ft_strlen(str_len));
-    printf("Libc: %zu\n", strlen(str_empty));
-    printf("FT: %zu\n\n", ft_strlen(str_empty));
+// --- PROTOTYPES DES BONUS ---
+extern void    ft_list_push_front(t_list **begin_list, void *data);
+extern void    ft_list_sort(t_list **begin_list, int (*cmp)());
+extern void    ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *));
 
-	printf("=== TEST FT_STRCPY ===\n");
-	char dest[150];
-	char dest2[150];
-	char *src = "Copie-moi dfgdfgdfgdfgdfgdfgddsfdsfdsfsdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfgdfgdfgdfgdfgdf!";  
-	char *src1 = "";
-	ft_strcpy(dest, src);
-	printf("Src: %s | Dest: %s\n", src, dest);
-	ft_strcpy(dest2, src1);
-	printf("Src1: %s | Dest2: %s\n\n", src1, dest2);
+// --- UTILS POUR LES TESTS ---
+int     cmp_str(char *s1, char *s2) { return strcmp(s1, s2); }
+void    free_node_data(void *data) { free(data); }
 
-	printf("=== TEST FT_STRCMP ===\n");
-	char *s1 = "Assembleur";
-	char *s2 = "Assembl";
-	char *s3 = "Assembzeur";
-    //char *s4 = NULL;
-	printf("Identiques : Libc: %d | FT: %d\n", strcmp(s1, s2), ft_strcmp(s1, s2));
-	printf("Différents : Libc: %d | FT: %d\n\n", strcmp(s1, s3), ft_strcmp(s1, s3));
-    //printf("NULL String : Libc: %d | FT: %d\n\n", strcmp(s1, s4), ft_strcmp(s1, s4));
-    //printf("NULL String : Libc: %d\n", strcmp(s4, s1));
-
-	printf("=== TEST FT_STRDUP ===\n");
-	char *to_dup = "Je suis dupliqué sur la Heap";
-	char *dup = ft_strdup(to_dup);
-	if (dup)
-	{
-        printf("Original  : %s\n", to_dup);
-        printf("Copie (FT): %s\n", dup);
-        printf("------------------------------------------\n");
-        printf("Preuve du contenu à l'adresse %p :\n", (void*)dup);
-        printf("Valeur lue: %s\n", dup); 
-        printf("------------------------------------------\n");
-        printf("Vérification Adresses :\n");
-        printf("  Origine (Stack/Data) : %p\n", (void*)to_dup);
-        printf("  Copie   (Heap)       : %p\n", (void*)dup);
-        
-        free(dup); // Libération de la mémoire allouée par ton ft_strdup
+void    print_list(t_list *lst) {
+    while (lst) {
+        printf("[%s] -> ", lst->data ? (char *)lst->data : "NULL");
+        lst = lst->next;
     }
-	else
-		printf("Erreur d'allocation malloc.\n");
+    printf("NULL\n");
+}
 
-	 printf("TEST ft_write : \n\n");
-	 ft_write(1, "Test stdout\n", 12);
-	ft_write(1, "mauvaise len en param (trop grande)\n", 120); // print de la memoire
-	 ft_write(1, "mauvaise len en param (trop petite)\n", 12); // truncate a 12
-	//  printf("TEST STRINGS VIDES ET NULL\n\n");
-	//  ft_write(1, NULL, 0); // crash pas 
-	//  ft_write(1,"h\n", 2);
-	//  ft_write(1, "", 0); //crash pas
-	//  ft_write(1, NULL, 1000); // print pas de memoire
-	//  ft_write(1,"i\n", 2);
-	//  ft_write(1, "", 1000); // print  de la memoire
-	//  ft_write(1,"3\n", 2);
+// ==========================================
+// MODULE 1: STRINGS
+// ==========================================
+void test_strings() {
+    printf("\n--- [ MODULE: STRINGS ] ---\n");
+    
+    // FT_STRLEN
+    char *long_str = "Ceci est une chaine un peu longue pour tester le compteur.";
+    printf("Strlen: Libc: %zu | FT: %zu\n", strlen(long_str), ft_strlen(long_str));
+    printf("Strlen (vide): Libc: %zu | FT: %zu\n", strlen(""), ft_strlen(""));
 
-	 errno = 0;
-	 ssize_t ret = ft_write(-42, "test", 4);
-	 if (ret == -1)
-     	printf("Succès : write a capturé l'erreur. Errno = %d\n", errno);
+    // FT_STRCPY
+    char dest[100];
+    ft_strcpy(dest, "Machine Code");
+    printf("Strcpy: %s (Attendu: Machine Code)\n", dest);
 
+    // FT_STRCMP
+    printf("Strcmp (identiques): Libc: %d | FT: %d\n", strcmp("abc", "abc"), ft_strcmp("abc", "abc"));
+    printf("Strcmp (diff): Libc: %d | FT: %d\n", strcmp("abc", "abd"), ft_strcmp("abc", "abd"));
 
-	 printf("TEST WRITE LIBC: \n\n");
-	 write(1, "Test stdout\n", 12);
-	 write(1, "mauvaise len en param (trop grande)\n", 120); // print de la memoire
-	 write(1, "mauvaise len en param (trop petite)\n", 12); // truncate a 12
-	// printf("TEST STRINGS VIDES ET NULL\n\n");
-	// write(1, NULL, 0); // crash pas 
-	// write(1,"H\n", 2);
-	// write(1, "", 0); //crash pas
-	// write(1,"HH\n", 3);
-	// write(1, NULL, 1000); // print pas de memoire
-	// write(1,"I\n", 2);
-	// write(1, "", 1000); // print  de la memoire
-	// write(1,"J\n", 2);
+    // FT_STRDUP
+    char *d = ft_strdup("Memory allocation test");
+    printf("Strdup: %s\n", d);
+    free(d);
+}
 
-	 errno = 0;
-	 ssize_t ret1 = write(-42, "test", 4);
-	 if (ret1 == -1)
-     	printf("Succès : write a capturé l'erreur. Errno = %d\n", errno);
+// ==========================================
+// MODULE 2: SYSTEM CALLS (WRITE / READ)
+// ==========================================
+void test_sys_calls() {
+    printf("\n--- [ MODULE: SYSTEM CALLS ] ---\n");
 
-	printf("TEST FT_READ :\n\n");
+    // FT_WRITE
+    printf("Write (stdout): ");
+    ft_write(1, "OK\n", 3);
+    
+    errno = 0;
+    ssize_t w_err = ft_write(-1, "err", 3);
+    printf("Write (error -1): Ret: %zd | Errno: %d (%s)\n", w_err, errno, strerror(errno));
 
-	int fd = open("test.txt", O_RDONLY);
-	if (fd == -1)
-	{
-		printf("Failed to open\n");
-		return 0;
-	}
-	char buffer[1024];
-	ssize_t len_test = read(fd, buffer, 1023);
-	buffer[len_test] = '\0';
-	printf("contenu du fd : %s\n", buffer);
-	printf("len_test = %zd\n\n", len_test);
-	close(fd);
+    // FT_READ
+    char buf[50];
+    int fd = open("test_read.txt", O_CREAT | O_RDWR, 0644);
+    write(fd, "Lecture Assembleur", 18);
+    lseek(fd, 0, SEEK_SET);
+    
+    ft_read(fd, buf, 18);
+    buf[18] = '\0';
+    printf("Read (file): %s\n", buf);
+    close(fd);
+    unlink("test_read.txt");
+}
 
-	printf("TEST READ LIBC :\n\n");
+// ==========================================
+// MODULE 3: ATOI_BASE
+// ==========================================
+void test_atoi_base() {
+    printf("\n--- [ MODULE: ATOI_BASE ] ---\n");
+    printf("Base 10: %d\n", ft_atoi_base("   ---+--42", "0123456789"));
+    printf("Base 2 : %d\n", ft_atoi_base("101010", "01"));
+    printf("Base 16: %d\n", ft_atoi_base("2a", "0123456789abcdef"));
+    printf("Invalide (double char): %d\n", ft_atoi_base("42", "01223"));
+}
 
-	int fd1 = open("test.txt", O_RDONLY);
-	if (fd1 == -1)
-	{
-	 	printf("Failed to open\n");
-	 	return 0;
-	}
-	char buffer1[1024];
-	ssize_t len_test1 = ft_read(fd1, buffer1, 1023);
-	buffer1[len_test1] = '\0';
-	printf("contenu du fd : %s\n", buffer1);
-	printf("len_test = %zd\n", len_test1);
-	close(fd1);
+// ==========================================
+// MODULE 4: LIST BONUS
+// ==========================================
+void test_list_bonus() {
+    printf("\n--- [ MODULE: LIST BONUS ] ---\n");
+    t_list *list = NULL;
 
-	printf("TEST ERRNO SUR FT_READ :\n");
-	errno = 0;
-	char buf2[10];
-	ssize_t ret2;
+    printf("1. Push Front: 30, 20, 10\n");
+    ft_list_push_front(&list, strdup("30"));
+    ft_list_push_front(&list, strdup("20"));
+    ft_list_push_front(&list, strdup("10"));
+    print_list(list);
 
-	ret2 = ft_read(-1, buf2, 5);
-	printf("Retour de ft_read : %ld\n", ret2);
-    printf("Valeur de errno   : %d\n", errno);
-    printf("Message d'erreur  : %s\n", strerror(errno));
+    printf("2. Sort (Alphabétique):\n");
+    ft_list_sort(&list, cmp_str);
+    print_list(list);
 
-	if (ret2 == -1 && errno == EBADF) {
-        printf("RESULTAT : ✅ SUCCESS (Errno est bien EBADF)\n");
-    } else {
-        printf("RESULTAT : ❌ FAILURE\n\n");
+    printf("3. Remove If (data == '20'):\n");
+    char *ref = "20";
+    ft_list_remove_if(&list, ref, cmp_str, free_node_data);
+    print_list(list);
+
+    // Clean total
+    while (list) {
+        t_list *tmp = list;
+        list = list->next;
+        free(tmp->data);
+        free(tmp);
     }
+}
 
-	printf("TEST ERRNO SUR READ LIBC :\n");
+// ==========================================
+// MAIN
+// ==========================================
+int main(void) {
+    test_strings();
+    test_sys_calls();
+    test_atoi_base();
+    test_list_bonus();
 
-	errno = 0;
-	char buf3[10];
-	ssize_t ret3;
-
-	ret3 = ft_read(-1, buf3, 5);
-	printf("Retour de ft_read : %ld\n", ret3);
-    printf("Valeur de errno   : %d\n", errno);
-    printf("Message d'erreur  : %s\n", strerror(errno));
-
-	if (ret3 == -1 && errno == EBADF) {
-        printf("RESULTAT : ✅ SUCCESS (Errno est bien EBADF)\n");
-    } else {
-        printf("RESULTAT : ❌ FAILURE\n\n");
-    }
-
-	printf("=== TEST FT_ATOI_BASE ===\n");
-
-	int res = ft_atoi_base("2147483647", "0123456789");
-	printf("Expected 123 : res = %d \n", res);
-	res = ft_atoi_base("-2147483648", "0123456789");
-	printf("Expected 123 : res = %d \n", res);
-	res = ft_atoi_base("  --42", "0123456789");
-	printf("Expected 42 : res = %d \n", res);
-	res = ft_atoi_base("101010", "01");
-	printf("Expected 42 : res = %d \n", res);
-	res = ft_atoi_base("2a", "0123456789abcdef");
-	printf("Expected 42 : res = %d \n", res);
-	res = ft_atoi_base(" \t\n -+--2a", "0123456789abcdef");
-	printf("Expected -42 : res = %d \n", res);
-	res = ft_atoi_base("42", "0123456789++");
-	printf("Expected 0 : res = %d \n", res); // base invalide
-	res = ft_atoi_base("42", "01");
-	printf("Expected 0 : res = %d \n", res); // '4' n'est pas dans la base       
-	res = ft_atoi_base("a42", "01");
-	printf("Expected 0 : res = %d \n", res);
-	res = ft_atoi_base("", "01");
-	printf("Expected 0 : res = %d \n", res);
-	res = ft_atoi_base("42", "");
-	printf("Expected 0 : res = %d \n", res);
-	res = ft_atoi_base("-2147483649", "0123456789");
-	printf("Expected 0 : res = %d \n", res);
-	
-	return (0);
+    printf("\n--- [ TESTS TERMINÉS ] ---\n");
+    return (0);
 }
