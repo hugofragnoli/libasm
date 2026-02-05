@@ -27,7 +27,7 @@ _ft_list_remove_if:
  
 
 .keep_node:                 ; Pas dans le if donc on avance normalement.
-    mov rbp, rbx            ; previous = current
+    mov r9, rbx            ; previous = current
     mov rbx, [rbx + 8]      ; current = current->next
     jmp .loop
 
