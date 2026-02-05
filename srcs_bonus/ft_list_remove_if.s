@@ -20,10 +20,10 @@ _ft_list_remove_if:
     push r9                 ; "previous" + 8 = 64 -> multiple de 16 donc ok pour alignement 
 
     ; ON ATTRIBUE LES VALEURS AUX REGISTRES INIT PRECEDEMMENT
-    mov r12, rdi            ; 
-    mov r13, rsi            ;
-    mov r14, rdx            ;
-    mov r15, rcx            ;
+    mov r12, rdi            ; **begin list
+    mov r13, rsi            ; *data_ref
+    mov r14, rdx            ; *cmp <- pointeur sur fonction
+    mov r15, rcx            ; *free <- pointeur sur fonction
     xor r9, r9              ; init r9 a 0. (previous = NULL)
     mov rbx, [r12]          ; current = *begin_list;
  
@@ -36,6 +36,13 @@ _ft_list_remove_if:
     mov r9, rbx            ; previous = current
     mov rbx, [rbx + 8]      ; current = current->next
     jmp .loop
+
+.remove_node:
+    mov r8, [rbx + 8]       ; registre volatile.
+
+    test r9, r9             ; on teste previous ? 
+    jz .is_head             ; si null cest qu on est sur la head.
+    mov [r9 + 8], r8        ; previous->next = current ->next
 
 .clean
     pop r9             ;
