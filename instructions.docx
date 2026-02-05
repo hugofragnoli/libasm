@@ -1,0 +1,133 @@
+Chapter III
+Mandatory part
+• The library must be called libasm.a.
+• You must submit a main function that will test your functions and compile with
+your library to demonstrate that it is functional.
+• You must rewrite the following functions in assembly:
+◦ ft_strlen (man 3 strlen)
+◦ ft_strcpy (man 3 strcpy)
+◦ ft_strcmp (man 3 strcmp)
+◦ ft_write (man 2 write)
+◦ ft_read (man 2 read)
+◦ ft_strdup (man 3 strdup, you can call to malloc)
+• You must check for errors during syscalls and handle them properly when needed.
+• Your code must set the variable errno properly.
+• For that, you are allowed to call the extern ___error or errno_location
+
+Bonus part
+You can rewrite these functions in assembly. The linked list functions will use the follow-
+ing structure:
+typedef struct s_list
+{
+void *data;
+struct s_list *next;
+} t_list;
+• ft_atoi_base (see Annex V.1)
+• ft_list_push_front (see Annex V.2)
+• ft_list_size (see Annex V.3)
+• ft_list_sort (see Annex V.4)
+• ft_list_remove_if (see Annex V.5)
+
+    ///////////////////////////////////////
+
+pour le fun : 
+
+strlen recursif 
+
+global _ft_strlen
+
+_ft_strlen:
+    cmp byte [rdi], 0       ; '\0'? 
+    jz .empty               ;
+
+    inc rdi                 ; (*str++)
+    call    ft_strlen       ; Rax recoit le res de la suite.
+
+    inc rax                 ; ON ajoute +1 au res.
+    ret                     ; On rend la main au parent.
+
+.empty:
+    xor rax, rax            ; On met rax a 0
+    ret                     ; on remonte le premier a 0
+
+    ///////////////////////////////////////
+
+; La convention ABI dit : "Si tu touches à RBX, R12, R13, R14 ou R15, 
+    ; tu dois les rendre dans le même état qu'à l'entrée".
+    Donc si on push dessus on doit tjrs pop a la fin.
+
+
+    ///////////////////////////////////////
+
+1. La "Poupée Russe" des registres
+En x86_64, les registres sont imbriqués. EAX, ce sont simplement les 32 bits de poids faible de RAX.
+
+RAX : 64 bits (Le registre complet)
+
+EAX : 32 bits (La moitié basse)
+
+AX : 16 bits
+
+AL / AH : 8 bits
+
+    ///////////////////////////////////////
+
+;Pour swap :
+; RDI = pointeur A, RSI = pointeur B
+;mov rax, [rdi]    ; Charger valeur A dans RAX (temporaire)
+;mov rdx, [rsi]    ; Charger valeur B dans RDX
+;mov [rdi], rdx    ; Mettre valeur B à l'adresse A
+;mov [rsi], rax    ; Mettre valeur A (stockée dans RAX) à l'adresse B 
+
+///////////////////////////////
+
+ASTUCE :
+Pour faire multiple de 64 on peut faire   
+sub rsp, 8              ; on retire 8 octets pour aligner la pile (56 + 8 = 64 donc multiple de 16)
+add rsp, 8              ; on ajoute 8 octets pour aligner la pile (56 - 8 = 48 donc multiple de 16)
+
+//////////////////////////////////////////////
+
+Pour compiler ton projet sur les machines Linux AMD64 de ton école, tu vas devoir effectuer des modifications sur ton Makefile et sur l'ensemble de tes fichiers Assembleur (.s).Voici les changements précis à appliquer :1. Modification du MakefileLe format de fichier binaire et la gestion des symboles diffèrent entre macOS (macho64) et Linux (elf64).NASM_FLAGS : Remplace -f macho64 par -f elf64.Les Underscores : Sur Linux, les fonctions C n'ont pas besoin de l'underscore _ devant leur nom.Flags de Compilation C : Le flag -arch x86_64 est spécifique à macOS ; tu peux le supprimer pour Linux.Extrait du Makefile modifié :MakefileNASM        = nasm
+NASM_FLAGS  = -f elf64  # Changé de macho64 à elf64
+
+# ... (reste du code)
+
+test: all
+	cc -Wall -Wextra -Werror $(MAIN_SRC) $(NAME) -o $(TEST_NAME) # Suppression de -arch x86_64
+2. Modification des Fichiers Assembleur (.s)Tu dois retirer les underscores devant les noms des fonctions globales et les appels externes.Symboles Globaux : Remplace global _ft_strlen par global ft_strlen.Appels Externes : Remplace extern ___error par extern __errno_location (sur la plupart des systèmes Linux) ou simplement extern errno.Appels de fonctions : Remplace call _malloc par call malloc.Exemple avec ft_strcmp.s :Extrait de code; Avant (macOS)
+global  _ft_strcmp
+_ft_strcmp:
+    ; ...
+
+; Après (Linux)
+global  ft_strcmp
+ft_strcmp:
+    ; ...
+3. Gestion des Appels Système (System Calls)C'est le changement le plus critique. Les IDs des appels système et la manière de gérer les erreurs (errno) sont différents sur Linux.ft_write.s sur Linux :Sur Linux, le code pour write est 1 (au lieu de 0x02000004). De plus, syscall retourne une valeur négative entre -1 et -4095 en cas d'erreur, au lieu d'utiliser le "Carry Flag".Extrait de codeextern __errno_location ; Fonction Linux pour errno
+global ft_write
+
+ft_write:
+    mov rax, 1          ; Code sys_write sur Linux
+    syscall             
+    cmp rax, 0          ; Vérifie si RAX est négatif
+    jl .error           
+    ret
+
+.error:
+    neg rax             ; On rend le code d'erreur positif (ex: -9 devient 9)
+    mov rdi, rax        ; Sauvegarde le code
+    call __errno_location ; RAX contient maintenant l'adresse d'errno
+    mov [rax], rdi      ; *errno = code_erreur
+    mov rax, -1         ; Retourne -1
+    ret
+4. Résumé des changements de syscall IDsFonctionCode macOSCode Linux (AMD64)sys_read0x020000030sys_write0x020000041💡 Conseil pour la portabilitéSi tu veux que ton code fonctionne sur les deux systèmes sans tout réécrire à chaque fois, tu peux utiliser des macros NASM au début de tes fichiers :Extrait de code%ifidn __OUTPUT_FORMAT__, elf64
+    %define FT_WRITE ft_write
+    %define SYSCALL_WRITE 1
+%else
+    %define FT_WRITE _ft_write
+    %define SYSCALL_WRITE 0x02000004
+%endif
+
+global FT_WRITE
+Veux-tu que je t'aide à réécrire spécifiquement ft_read.s pour Linux avec la gestion d'erreur cmp rax, 0 ?
