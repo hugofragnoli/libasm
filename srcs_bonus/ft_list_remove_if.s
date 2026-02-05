@@ -41,8 +41,12 @@ _ft_list_remove_if:
     mov r8, [rbx + 8]       ; registre volatile.
 
     test r9, r9             ; on teste previous ? 
-    jz .is_head             ; si null cest qu on est sur la head.
+    jz .is_first             ; si null cest qu on est sur la head.
     mov [r9 + 8], r8        ; previous->next = current ->next
+    jmp .free               ;
+
+.is_first                    ;
+    mov [r12], r8           ; *begin_list = current -> next
 
 .clean
     pop r9             ;
