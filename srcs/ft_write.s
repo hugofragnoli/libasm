@@ -1,17 +1,42 @@
-extern ___error          ; 
-global _ft_write         ;
+%ifidn __OUTPUT_FORMAT__, elf64
+    %define FT_WRITE ft_write
+    %define SYSCALL_WRITE 1
+    %define ERRNO_FUNC __errno_location
+%else
+    %define FT_WRITE _ft_write
+    %define SYSCALL_WRITE 0x02000004
+    %define ERRNO_FUNC ___error
+%endif
 
-_ft_write:
-    mov rax, 0x02000004     ; Id de sys_write sur MACOS
-    syscall                 ; Appel Kernel
-    jc .error               ; Jump if "Carry" -> si le carry est a 1, ERREUR (specificite MAC -> sur linux si value negative cest ERREUR)
-    ret                     ;
+extern ERRNO_FUNC
+global FT_WRITE
 
-.error:
-    push rax                ; On save ce code sur la pile (ce push aligne aussi la pile a 16 octets)
+FT_WRITE:
+    mov rax, SYSCALL_WRITE
+    syscall
+    
+    ; --- GESTION ERREUR ---
+    %ifidn __OUTPUT_FORMAT__, elf64
+        cmp rax, 0          ; Sur Linux, erreur si RAX < 0
+        jl .error_linux
+    %else
+        jc .error_mac       ; Sur Mac, erreur si Carry Flag est mis
+    %endif
+    ret
 
-    call ___error           ; On appelle la fonction pour savoir ou estt errno -> maintenant rax contient errno.
-    pop r8                  ; On recup le code derreur dans r8
-    mov [rax], r8           ; On met la valeur de lerreur (r8) a l'adresse de rax.
-    mov rax, -1             ; On ret -1 comme la doc de write.
+.error_linux:
+    neg rax                 ; Linux renvoie -ERRNO, on le rend positif
+    push rax
+    jmp .set_errno
+
+.error_mac:
+    push rax                ; Mac met déjà le code positif dans RAX
+
+.set_errno:
+    sub rsp, 8              ; Alignement pile avant call
+    call ERRNO_FUNC
+    add rsp, 8
+    pop r8
+    mov [rax], r8
+    mov rax, -1
     ret

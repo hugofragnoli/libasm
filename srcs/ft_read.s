@@ -1,21 +1,43 @@
-; Proto %rax	System call	    %rdi	            %rsi	            %rdx
-;          0	sys_read	    unsigned int fd	    char *buf	        size_t count
+; Détection du format pour adapter les symboles et syscalls
+%ifidn __OUTPUT_FORMAT__, elf64
+    %define FT_READ ft_read
+    %define SYSCALL_READ 0        ; ID Read sur Linux
+    %define ERRNO_FUNC __errno_location
+%else
+    %define FT_READ _ft_read
+    %define SYSCALL_READ 0x02000003 ; ID Read sur macOS
+    %define ERRNO_FUNC ___error
+%endif
 
-extern ___error
-global _ft_read
+extern ERRNO_FUNC
+global FT_READ
 
-_ft_read:
-    mov rax, 0x2000003      ; Code de sys_read
-    syscall                 ; Le Kernel remplit le buffer en RSI
-    jc .error               ; Si carry flag = 1, erreur (code dans RAX)
-    ret                     ; RAX contient déjà le nombre d'octets lus
+FT_READ:
+    mov rax, SYSCALL_READ
+    syscall
+    
+    ; --- GESTION ERREUR ---
+    %ifidn __OUTPUT_FORMAT__, elf64
+        cmp rax, 0          ; Linux : erreur si RAX < 0
+        jl .error_linux
+    %else
+        jc .error_mac       ; Mac : erreur si Carry Flag (CF) est à 1
+    %endif
+    ret
 
-.error:
-    push rbp                ; Aligne la stack sur 16 octets et save lancienne valeeur de rbp sur la pile
-    mov rbp, rsp            ; On annonce que le bas de notre nouvelle zone est lendroit actuel de la pile. Ca permet au debugueur de sy retrouver dans la hierarchie des appels.
-    mov rdi, rax            ; Sauvegarde le code d'erreur
-    call ___error           ; RAX = pointeur vers errno
-    mov [rax], rdi          ; *errno = code_erreur
-    mov rax, -1             ; Retourne -1
-    pop rbp                 ; alignement de la pile. (16 octets).
+.error_linux:
+    neg rax                 ; Linux renvoie -code_erreur, on le repasse en positif
+    push rax
+    jmp .set_errno
+
+.error_mac:
+    push rax                ; Mac met déjà le code positif dans RAX
+
+.set_errno:
+    sub rsp, 8              ; Aligner la pile à 16 octets avant le call
+    call ERRNO_FUNC         ; RAX = &errno
+    add rsp, 8
+    pop r8                  ; Récupère le code d'erreur
+    mov [rax], r8           ; *errno = code
+    mov rax, -1             ; Retourne -1 comme spécifié par man read
     ret
