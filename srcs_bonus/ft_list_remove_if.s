@@ -31,6 +31,14 @@ _ft_list_remove_if:
     test rbx, rbx           ; current est il null ?
     jz .clean
 
+    ; Comparaison
+    mov rdi, [rbx]      ; arg1: current->data
+    mov rsi, r13        ; arg2: data_ref
+    call r14            ; call cmp()
+
+    test eax, eax       ; Si le résultat est 0, c'est un match ! On utilise eax car le retour de cmp est un int -> 4 octets donc 32 bites donc eax 32 bitsc est parfait 
+    jz .remove_node     ; On saute à la suppression
+    jmp .keep_node      ; Sinon, on garde le nœud
 
 .keep_node:                 ; Pas dans le if donc on avance normalement.
     mov r9, rbx            ; previous = current
