@@ -24,7 +24,13 @@ _ft_list_remove_if:
     mov r13, rsi            ;
     mov r14, rdx            ;
     mov r15, rcx            ;
+    xor r9, r9              ; init r9 a 0. (previous = NULL)
+    mov rbx, [r12]          ; current = *begin_list;
  
+ .loop
+    test rbx, rbx           ; current est il null ?
+    jz .clean
+
 
 .keep_node:                 ; Pas dans le if donc on avance normalement.
     mov r9, rbx            ; previous = current
