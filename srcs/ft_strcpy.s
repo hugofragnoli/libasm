@@ -1,6 +1,6 @@
-global _ft_strcpy
+global ft_strcpy
 
-_ft_strcpy:
+ft_strcpy:
     mov rax, rdi            ; On sauvegarde rdi (dest) dans rax pour le return final
     xor rcx, rcx            ; On utilise rcx comme index (compteur = 0)
 

@@ -1,8 +1,8 @@
 ; proto void ft_list_sort(t_list **begin_list, int (*cmp)())
 
-global _ft_list_sort
+global ft_list_sort
 
-_ft_list_sort:
+ft_list_sort:
     ; TEST NULL
     test rdi, rdi       ; Check si pointeur **begin list est NULL.
     jz .empty             ; si oui on leave / ret rien car rax est NULL ? 

@@ -2,10 +2,10 @@
 ; The functions pointed to by cmp and free_fct will be used as: (*cmp)(list_ptr->data, data_ref);
 ;(*free_fct)(list_ptr->data);
 
-global _ft_list_remove_if
-extern _free
+global ft_list_remove_if
+extern free
 
-_ft_list_remove_if:
+ft_list_remove_if:
     test rdi, rdi           ; begin_list == NULL ?
     jz .empty                 ; return
     mov rax, [rdi]          ;
@@ -68,7 +68,7 @@ _ft_list_remove_if:
     call r15            ; call free_fct(data)
     
     mov rdi, rbx        ; rdi = current (le nœud lui-même)
-    call _free          ; call free(node)
+    call free          ; call free(node)
     
     add rsp, 8          ; On nettoie l'alignement
     pop rbx             ; On récupère le "suivant" directement dans rbx 

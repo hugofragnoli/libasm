@@ -1,9 +1,9 @@
 ; proto void ft_list_push_front(t_list **begin_list, void *data);
 
-global _ft_list_push_front
-extern _malloc
+global ft_list_push_front
+extern malloc
 
-_ft_list_push_front:
+ft_list_push_front:
     push rbp            ; push le sommet de la pile.
     mov rbp, rsp        ; on save son adresse a la base de la pile.
     push rbx            ; Pour sauver begin_list
@@ -14,7 +14,7 @@ _ft_list_push_front:
 
     ; Préparation du malloc
     mov rdi, 16         ; Taille d'une struct (2 pointeurs de 8 octets * data et *next !!)
-    call _malloc        ; RAX contient maintenant l'adresse du nouveau noeud
+    call malloc        ; RAX contient maintenant l'adresse du nouveau noeud
     test rax, rax       ; Si malloc échoue
     jz .err
     mov [rax], r12      ; new_node->data = data

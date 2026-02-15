@@ -1,6 +1,6 @@
-global  _ft_strcmp
+global  ft_strcmp
 
-_ft_strcmp:
+ft_strcmp:
     xor rax, rax                ; On nettoie rax (prêt pour movzx) xor permet des binaires plus legers. Mov devmande dencoder 0 de maniere explicite alors que xor  trvaille sur elle meme
     xor rdx, rdx                ; On nettoie rdx. Avec xor,, le processeur ne fait pas de calcul, Il comprend que le result sera 0 et reinit le registre au niveau materiel sans utiliser d unité de calcul.
 

@@ -1,6 +1,6 @@
-global _ft_strlen
+global ft_strlen
 
-_ft_strlen:
+ft_strlen:
     mov rax, rdi            ; On sauvegarde l'adresse de départ(input) dans rax (valeur de retour)
 
 .loop:

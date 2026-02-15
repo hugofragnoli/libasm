@@ -1,8 +1,8 @@
 ; proto int ft_list_size(t_list *begin_list);
 
-global _ft_list_size
+global ft_list_size
 
-_ft_list_size:
+ft_list_size:
     xor rax, rax            ; On init le compteur a 0.
 
 

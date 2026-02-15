@@ -1,8 +1,8 @@
 section .text
-    global _ft_atoi_base
-    extern _ft_strlen
+    global ft_atoi_base
+    extern ft_strlen
 
-_ft_atoi_base:
+ft_atoi_base:
     push rbp
     mov rbp, rsp
 
@@ -15,7 +15,7 @@ _ft_atoi_base:
 .check_base:
     push rdi             ; Sauvegarde l'adresse de str car RDI va être modifié pour strlen
     mov rdi, rsi         ; RDI devient l'argument pour strlen(base)
-    call _ft_strlen      ; RAX contient maintenant la longueur de la base
+    call ft_strlen      ; RAX contient maintenant la longueur de la base
     pop rdi              ; Restaure l'adresse de str dans RDI
     cmp rax, 2           ; La base doit faire au moins 2 caractères
     jl .error_return     ; Si len < 2, erreur
